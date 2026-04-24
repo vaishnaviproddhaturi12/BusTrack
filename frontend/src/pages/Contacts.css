@@ -1,0 +1,96 @@
+.contacts-container {
+  padding: 2rem 0;
+  min-height: 80vh;
+}
+
+.page-title {
+  text-align: center;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 3rem;
+}
+
+.contacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.contact-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-5px);
+}
+
+.contact-header {
+  background: #007bff;
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.contact-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.contact-details {
+  padding: 1.5rem;
+}
+
+.contact-person {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.contact-person:last-child {
+  margin-bottom: 0;
+}
+
+.person-icon {
+  font-size: 2rem;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.person-info h4 {
+  margin: 0 0 0.5rem 0;
+  color: #555;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.person-name {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-weight: bold;
+}
+
+.phone-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-block;
+  transition: color 0.3s ease;
+}
+
+.phone-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}

@@ -1,0 +1,78 @@
+.bus-pass-card {
+  max-width: 520px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #1b3a86, #0c2145);
+  color: #ffffff;
+  padding: 28px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+}
+
+.bus-pass-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.bus-pass-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.bus-pass-header p {
+  margin: 4px 0 0;
+  color: #cbd5f7;
+}
+
+.bus-pass-chip {
+  background: rgba(255, 255, 255, 0.14);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+}
+
+.bus-pass-details {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.bus-pass-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.bus-pass-row:last-child {
+  border-bottom: none;
+}
+
+.bus-pass-row span {
+  color: #9bb0ff;
+}
+
+.bus-pass-row strong {
+  font-size: 1rem;
+  color: #fff;
+}
+
+.bus-pass-code {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+
+.bus-pass-code small {
+  color: #cbd5f7;
+}
+
+.bus-pass-footer {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 0.85rem;
+  color: #bec8ff;
+}

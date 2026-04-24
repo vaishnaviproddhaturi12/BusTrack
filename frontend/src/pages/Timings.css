@@ -1,0 +1,89 @@
+.timings-container {
+  padding: 2rem 0;
+  min-height: 80vh;
+}
+
+.page-title {
+  text-align: center;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 3rem;
+}
+
+.timings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.timing-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.timing-card:hover {
+  transform: translateY(-5px);
+}
+
+.timing-header {
+  background: #007bff;
+  color: white;
+  padding: 1.5rem;
+}
+
+.timing-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.timing-schedule {
+  padding: 1.5rem;
+}
+
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  color: #555;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.schedule-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.time {
+  font-weight: bold;
+  color: #333;
+}
+
+.direction {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.to-campus {
+  background: #28a745;
+  color: white;
+}
+
+.from-campus {
+  background: #dc3545;
+  color: white;
+}
