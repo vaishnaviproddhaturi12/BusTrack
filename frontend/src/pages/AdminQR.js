@@ -15,7 +15,7 @@ const AdminQR = () => {
 
   const fetchBuses = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/bus/all');
+      const response = await fetch('https://bustrack-backend-dod9.onrender.com/api/bus/all');
       const data = await response.json();
       setBuses(data);
       
