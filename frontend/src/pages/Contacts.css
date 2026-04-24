@@ -1,18 +1,61 @@
 .contacts-container {
   padding: 2rem 0;
   min-height: 80vh;
+  background:
+    radial-gradient(circle at top left, rgba(124, 227, 206, 0.15), transparent 26%),
+    linear-gradient(180deg, #f5fbfb 0%, #edf5f7 100%);
 }
 
 .page-title {
   text-align: center;
-  color: #333;
+  color: #0d3542;
   margin-bottom: 0.5rem;
+  font-weight: 800;
 }
 
 .page-subtitle {
   text-align: center;
-  color: #666;
+  color: #5c7680;
   margin-bottom: 3rem;
+}
+
+.search-section {
+  max-width: 820px;
+  margin: 0 auto 2rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 18px 36px rgba(15, 41, 58, 0.08);
+  border: 1px solid rgba(17, 73, 91, 0.08);
+  padding: 2rem;
+}
+
+.search-section .form-control {
+  border-radius: 999px;
+  border: 1px solid rgba(13, 102, 112, 0.2);
+  padding: 0.85rem 1.1rem;
+}
+
+.search-section .form-control:focus {
+  border-color: #62d6bf;
+  box-shadow: 0 0 0 0.25rem rgba(98, 214, 191, 0.2);
+}
+
+.search-section .btn {
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #0f4150, #1c7c7f);
+  box-shadow: 0 14px 28px rgba(15, 65, 80, 0.18);
+}
+
+.search-button-col {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.search-button {
+  min-width: 132px;
+  padding: 0.82rem 1.35rem;
 }
 
 .contacts-grid {
@@ -22,21 +65,23 @@
 }
 
 .contact-card {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 22px;
+  box-shadow: 0 18px 38px rgba(15, 41, 58, 0.08);
+  border: 1px solid rgba(17, 73, 91, 0.08);
   overflow: hidden;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .contact-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
+  box-shadow: 0 24px 44px rgba(15, 41, 58, 0.13);
 }
 
 .contact-header {
-  background: #007bff;
+  background: linear-gradient(135deg, #10394b, #1b7f81);
   color: white;
-  padding: 1.5rem;
+  padding: 1.6rem;
   text-align: center;
 }
 
@@ -54,8 +99,9 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
+  background: #f2fbf9;
+  border-radius: 16px;
+  border: 1px solid rgba(98, 214, 191, 0.18);
 }
 
 .contact-person:last-child {
@@ -70,7 +116,7 @@
 
 .person-info h4 {
   margin: 0 0 0.5rem 0;
-  color: #555;
+  color: #55717a;
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -78,12 +124,12 @@
 
 .person-name {
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: #103946;
   font-weight: bold;
 }
 
 .phone-link {
-  color: #007bff;
+  color: #0d6670;
   text-decoration: none;
   font-weight: 500;
   display: inline-block;
@@ -91,6 +137,74 @@
 }
 
 .phone-link:hover {
-  color: #0056b3;
+  color: #0a4450;
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .contacts-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .search-section {
+    max-width: 92%;
+    margin: 0 auto 1.25rem;
+    padding: 1.1rem;
+    border-radius: 16px;
+  }
+
+  .search-section .row {
+    gap: 0.85rem;
+  }
+
+  .search-section .form-control {
+    padding: 0.72rem 0.95rem;
+    font-size: 0.95rem;
+  }
+
+  .search-button-col {
+    justify-content: flex-start;
+  }
+
+  .search-button {
+    min-width: 108px;
+    padding: 0.68rem 1rem;
+    font-size: 0.92rem;
+  }
+
+  .contact-card {
+    border-radius: 18px;
+  }
+
+  .contact-header {
+    padding: 1.1rem;
+  }
+
+  .contact-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .contact-details {
+    padding: 1rem;
+  }
+
+  .contact-person {
+    padding: 0.85rem;
+    margin-bottom: 1rem;
+    border-radius: 14px;
+  }
+
+  .person-icon {
+    font-size: 1.6rem;
+    margin-right: 0.75rem;
+  }
+
+  .person-name {
+    font-size: 0.96rem;
+  }
+
+  .phone-link {
+    font-size: 0.92rem;
+  }
 }

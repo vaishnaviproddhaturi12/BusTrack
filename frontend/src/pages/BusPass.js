@@ -24,8 +24,9 @@ const BusPass = () => {
   const route = user.bus?.route || 'Assigned Route';
 
   return (
-    <div className="container my-5">
-      <div className="bus-pass-card mx-auto">
+    <div className="bus-pass-page py-5">
+      <div className="container">
+        <div className="bus-pass-card mx-auto">
         <div className="bus-pass-header">
           <div>
             <h3>BusTrack</h3>
@@ -57,9 +58,10 @@ const BusPass = () => {
           <small>Valid for 2025-2026</small>
         </div>
 
-        <div className="bus-pass-footer">
-          <span>Issued by CVR</span>
-          <span>{new Date().toLocaleDateString()}</span>
+          <div className="bus-pass-footer">
+            <span>Issued by CVR</span>
+            <span>{new Date().toLocaleDateString()}</span>
+          </div>
         </div>
       </div>
     </div>

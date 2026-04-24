@@ -89,8 +89,9 @@ const AdminQR = () => {
   }
 
   return (
-    <div className="container my-5">
-      <div className="admin-qr-container">
+    <div className="admin-qr-page py-5">
+      <div className="container">
+        <div className="admin-qr-container">
         <h2>🚌 Bus QR Code Generator</h2>
         <p className="text-muted">Generate and print QR codes for all buses. Paste these inside each bus for student attendance scanning.</p>
         
@@ -141,6 +142,7 @@ const AdminQR = () => {
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

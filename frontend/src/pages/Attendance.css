@@ -1,3 +1,10 @@
+.attendance-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(124, 227, 206, 0.15), transparent 26%),
+    linear-gradient(180deg, #f5fbfb 0%, #edf5f7 100%);
+}
+
 .attendance-container {
   max-width: 800px;
   margin: 0 auto;
@@ -76,6 +83,22 @@
   max-width: 400px;
   width: 90%;
   text-align: center;
+}
+
+.scanner-close-btn {
+  margin-top: 0.75rem;
+  background: linear-gradient(135deg, #10394b, #1d7d80);
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 0.7rem 1.4rem;
+  box-shadow: 0 14px 28px rgba(16, 57, 75, 0.18);
+}
+
+.scanner-close-btn:hover,
+.scanner-close-btn:focus-visible {
+  background: linear-gradient(135deg, #15475c, #239194);
+  color: #ffffff;
 }
 
 .scanner-placeholder {

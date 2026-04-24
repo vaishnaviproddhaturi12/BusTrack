@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import API_BASE_URL from '../apiConfig';
 import './RoutePage.css';
 
+const naturalCompare = (a = '', b = '') =>
+  a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+
 const RoutePage = () => {
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,13 +13,14 @@ const RoutePage = () => {
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/bus/routes`)
-      .then(res => res.json())
-      .then(data => {
-        setRoutes(data);
-        setFilteredRoutes(data);
+      .then((res) => res.json())
+      .then((data) => {
+        const sortedRoutes = [...data].sort((a, b) => naturalCompare(a.name, b.name));
+        setRoutes(sortedRoutes);
+        setFilteredRoutes(sortedRoutes);
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
         setLoading(false);
       });
@@ -33,9 +37,9 @@ const RoutePage = () => {
   const getStopTimes = (stops) => {
     if (!stops || stops.length === 0) return [];
 
-    const morningStart = 7 * 60 + 40; // 7:40 AM
-    const morningEnd = 9 * 60; // 9:00 AM
-    const eveningStart = 16 * 60; // 4:00 PM
+    const morningStart = 7 * 60 + 40;
+    const morningEnd = 9 * 60;
+    const eveningStart = 16 * 60;
     const stopCount = stops.length;
     const interval = stopCount > 1 ? Math.round((morningEnd - morningStart) / (stopCount - 1)) : 10;
 
@@ -55,9 +59,9 @@ const RoutePage = () => {
       return;
     }
 
-    const filtered = routes.filter(route => {
+    const filtered = routes.filter((route) => {
       const matchesName = route.name.toLowerCase().includes(normalizedQuery);
-      const matchesStop = route.stops?.some(stop => stop.toLowerCase().includes(normalizedQuery));
+      const matchesStop = route.stops?.some((stop) => stop.toLowerCase().includes(normalizedQuery));
       return matchesName || matchesStop;
     });
 
@@ -89,7 +93,6 @@ const RoutePage = () => {
         <h1 className="page-title">Bus Routes</h1>
         <p className="page-subtitle">Explore all available bus routes and their timings</p>
 
-        {/* Search Section */}
         <div className="search-section mb-4">
           <div className="row">
             <div className="col-md-8">
@@ -99,53 +102,64 @@ const RoutePage = () => {
                 placeholder="Search routes or stops..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
-            <div className="col-md-4">
-              <button className="btn btn-primary w-100" onClick={() => handleSearch()}>
+            <div className="col-md-4 search-button-col">
+              <button className="btn btn-primary search-button" onClick={() => handleSearch()}>
                 Search
               </button>
             </div>
           </div>
         </div>
 
-        <div className="routes-grid">
-          {filteredRoutes.map(route => {
-            const stopTimes = getStopTimes(route.stops);
-            return (
-              <div key={route.id} className="route-card">
-                <div className="route-header">
-                  <h3>{route.name}</h3>
-                  <div className="route-info">
-                    <span className="route-distance">{route.distance}</span>
-                    <span className="route-summary">Starts 7:40 AM · Ends 9:00 AM · Evening 4:00 PM</span>
+        {filteredRoutes.length === 0 ? (
+          <p className="text-center text-muted mt-4">No matching routes found.</p>
+        ) : (
+          <div className="routes-grid">
+            {filteredRoutes.map((route, index) => {
+              const stopTimes = getStopTimes(route.stops);
+              const busLabel = route.busNumber || `BUS ${String(index + 1).padStart(3, '0')}`;
+              return (
+                <div key={route.id} className="route-card">
+                  <div className="route-header">
+                    <div className="route-title-group">
+                      <h3>{route.name}</h3>
+                      <span className="route-bus-number">{busLabel}</span>
+                    </div>
+                    <div className="route-info">
+                      <span className="route-distance">{route.distance}</span>
+                      <span className="route-summary">
+                        <span>Starts 7:40 AM · Ends 9:00 AM</span>
+                        <span>Evening 4:00 PM</span>
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                <div className="route-details">
-                  <div className="route-times-section">
-                    <h4>Stop Times</h4>
-                    <div className="route-times-list">
-                      <div className="route-time-entry header-row">
-                        <span className="route-time-label">Stop</span>
-                        <span className="route-time-label">Morning</span>
-                        <span className="route-time-label">Evening</span>
-                      </div>
-                      {stopTimes.map((entry, index) => (
-                        <div key={index} className="route-time-entry">
-                          <span>{entry.stop}</span>
-                          <span>{entry.morningTime}</span>
-                          <span>{entry.eveningTime}</span>
+                  <div className="route-details">
+                    <div className="route-times-section">
+                      <h4>Stop Times</h4>
+                      <div className="route-times-list">
+                        <div className="route-time-entry header-row">
+                          <span className="route-time-label">Stop</span>
+                          <span className="route-time-label">Morning</span>
+                          <span className="route-time-label">Evening</span>
                         </div>
-                      ))}
+                        {stopTimes.map((entry, index) => (
+                          <div key={index} className="route-time-entry">
+                            <span>{entry.stop}</span>
+                            <span>{entry.morningTime}</span>
+                            <span>{entry.eveningTime}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import API_BASE_URL from '../apiConfig';
 import './Auth.css';
 
@@ -13,6 +14,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -59,8 +61,11 @@ const Login = () => {
         }
 
         login(data.token, userData);
+        showToast('Logged in successfully.');
         if (data.user.role === 'driver') {
           navigate('/driver');
+        } else if (data.user.role === 'admin') {
+          navigate('/');
         } else {
           navigate('/track');
         }

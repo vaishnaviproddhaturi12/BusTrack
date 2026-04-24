@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
 import { useAuth } from '../context/AuthContext';
 import API_BASE_URL from '../apiConfig';
 import './Attendance.css';
@@ -11,6 +11,31 @@ const Attendance = () => {
   const [messageType, setMessageType] = useState('');
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const updateCameraLabels = () => {
+    const scannerRoot = document.getElementById('qr-reader');
+    if (!scannerRoot) {
+      return false;
+    }
+
+    const cameraSelect = scannerRoot.querySelector('select');
+    if (!cameraSelect) {
+      return false;
+    }
+
+    let updated = false;
+
+    Array.from(cameraSelect.options).forEach((option, index) => {
+      if (!option.value) {
+        return;
+      }
+
+      option.text = index === 0 ? 'Front Camera' : 'Back Camera';
+      updated = true;
+    });
+
+    return updated;
+  };
 
   useEffect(() => {
     if (user && user.role === 'student') {
@@ -25,7 +50,12 @@ const Attendance = () => {
 
     const scanner = new Html5QrcodeScanner(
       'qr-reader',
-      { fps: 10, qrbox: { width: 250, height: 250 } },
+      {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+        rememberLastUsedCamera: true
+      },
       false
     );
 
@@ -51,7 +81,18 @@ const Attendance = () => {
       }
     );
 
+    let retryCount = 0;
+    const labelTimer = setInterval(() => {
+      const updated = updateCameraLabels();
+      retryCount += 1;
+
+      if (updated || retryCount >= 8) {
+        clearInterval(labelTimer);
+      }
+    }, 400);
+
     return () => {
+      clearInterval(labelTimer);
       try {
         scanner.clear();
       } catch (error) {
@@ -164,91 +205,93 @@ const Attendance = () => {
   const now = new Date();
 
   return (
-    <div className="container my-5">
-      <div className="attendance-container">
-        <h2>Bus Attendance</h2>
+    <div className="attendance-page py-5">
+      <div className="container">
+        <div className="attendance-container">
+          <h2>Bus Attendance</h2>
 
-        <div className="attendance-window-notice" style={{ background: '#d4edda', borderColor: '#c3e6cb' }}>
-          <p>Morning attendance: 7:00 AM to 9:00 AM</p>
-          <p>Evening attendance: 3:45 PM to 6:00 PM</p>
-          <p className="text-muted">Current time: {now.toLocaleTimeString()}</p>
-        </div>
-
-        <div className="scan-section">
-          <p className="scan-instructions">
-            Scan the QR code inside your bus to mark attendance.
-          </p>
-
-          <div className="scan-buttons">
-            <button className="btn btn-primary btn-lg" onClick={openScanner}>
-              Scan Bus QR
-            </button>
+          <div className="attendance-window-notice" style={{ background: '#d4edda', borderColor: '#c3e6cb' }}>
+            <p>Morning attendance: 7:00 AM to 9:00 AM</p>
+            <p>Evening attendance: 3:45 PM to 6:00 PM</p>
+            <p className="text-muted">Current time: {now.toLocaleTimeString()}</p>
           </div>
-        </div>
 
-        {message && (
-          <div className={`alert alert-${messageType === 'error' ? 'danger' : messageType === 'success' ? 'success' : 'info'}`}>
-            {message}
-          </div>
-        )}
+          <div className="scan-section">
+            <p className="scan-instructions">
+              Scan the QR code inside your bus to mark attendance.
+            </p>
 
-        {scanning && (
-          <div className="scanner-modal">
-            <div className="scanner-content">
-              <h4>QR Scanner</h4>
-              <p>Point your camera at the bus QR code</p>
-              <div id="qr-reader" style={{ width: '100%' }}></div>
-              <p className="text-muted small">Position the QR code inside the frame</p>
-              <button className="btn btn-secondary" onClick={closeScanner}>
-                Close
+            <div className="scan-buttons">
+              <button className="btn btn-primary btn-lg" onClick={openScanner}>
+                Scan Bus QR
               </button>
             </div>
           </div>
-        )}
 
-        <div className="attendance-history mt-5">
-          <h3>Your Attendance History</h3>
-
-          {loading ? (
-            <p>Loading...</p>
-          ) : attendance.length === 0 ? (
-            <p className="text-muted">No attendance records found</p>
-          ) : (
-            <div className="table-responsive">
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Bus</th>
-                    <th>Morning</th>
-                    <th>Evening</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {attendance.map((record, index) => (
-                    <tr key={index}>
-                      <td>{record.date}</td>
-                      <td>{record.busId?.busNumber || 'N/A'}</td>
-                      <td>
-                        {record.morning ? (
-                          <span className="badge bg-success">Present</span>
-                        ) : (
-                          <span className="badge bg-secondary">-</span>
-                        )}
-                      </td>
-                      <td>
-                        {record.evening ? (
-                          <span className="badge bg-success">Present</span>
-                        ) : (
-                          <span className="badge bg-secondary">-</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {message && (
+            <div className={`alert alert-${messageType === 'error' ? 'danger' : messageType === 'success' ? 'success' : 'info'}`}>
+              {message}
             </div>
           )}
+
+          {scanning && (
+            <div className="scanner-modal">
+              <div className="scanner-content">
+                <h4>QR Scanner</h4>
+                <p>Point your camera at the bus QR code</p>
+                <div id="qr-reader" style={{ width: '100%' }}></div>
+                <p className="text-muted small">Position the QR code inside the frame</p>
+                <button className="btn scanner-close-btn" onClick={closeScanner}>
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="attendance-history mt-5">
+            <h3>Your Attendance History</h3>
+
+            {loading ? (
+              <p>Loading...</p>
+            ) : attendance.length === 0 ? (
+              <p className="text-muted">No attendance records found</p>
+            ) : (
+              <div className="table-responsive">
+                <table className="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Bus</th>
+                      <th>Morning</th>
+                      <th>Evening</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {attendance.map((record, index) => (
+                      <tr key={index}>
+                        <td>{record.date}</td>
+                        <td>{record.busId?.busNumber || 'N/A'}</td>
+                        <td>
+                          {record.morning ? (
+                            <span className="badge bg-success">Present</span>
+                          ) : (
+                            <span className="badge bg-secondary">-</span>
+                          )}
+                        </td>
+                        <td>
+                          {record.evening ? (
+                            <span className="badge bg-success">Present</span>
+                          ) : (
+                            <span className="badge bg-secondary">-</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

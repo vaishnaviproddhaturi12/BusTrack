@@ -233,6 +233,10 @@ const Track = () => {
     return <Navigate to="/driver" />;
   }
 
+  if (user.role === 'admin') {
+    return <Navigate to="/" />;
+  }
+
   if (user.role !== 'student') {
     return (
       <div className="track-container">

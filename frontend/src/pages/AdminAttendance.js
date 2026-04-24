@@ -52,8 +52,9 @@ const AdminAttendance = () => {
   const eveningPresent = attendance.filter(a => a.evening).length;
 
   return (
-    <div className="container my-5">
-      <div className="admin-attendance-container">
+    <div className="admin-attendance-page py-5">
+      <div className="container">
+        <div className="admin-attendance-container">
         <h2>📊 Attendance Dashboard</h2>
         
         <div className="attendance-stats">
@@ -131,6 +132,7 @@ const AdminAttendance = () => {
             </table>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

@@ -42,14 +42,14 @@ const Home = () => {
             routes, timings, and contact information.
           </p>
           <div className="hero-buttons">
-            <Link to="/routes" className="btn btn-primary btn-lg me-3">
+            <Link to="/routes" className="btn btn-primary btn-lg hero-action-btn">
               View Routes
             </Link>
-            <button onClick={scrollToTimings} className="btn btn-primary btn-lg me-3">
+            <button onClick={scrollToTimings} className="btn btn-primary btn-lg hero-action-btn">
               Check Timings
             </button>
             {user && user.role === 'student' && user.bus && (
-              <Link to="/track" className="btn btn-success btn-lg">
+              <Link to="/track" className="btn btn-primary btn-lg hero-action-btn">
                 Track My Bus
               </Link>
             )}
@@ -73,7 +73,7 @@ const Home = () => {
                 <div className="feature-icon">🗺️</div>
                 <h3>Bus Routes</h3>
                 <p>View detailed bus routes and stops across the campus.</p>
-                <Link to="/routes" className="btn btn-outline-primary">Explore Routes</Link>
+                <Link to="/routes" className="btn btn-outline-primary feature-action-btn">Explore Routes</Link>
               </div>
             </div>
             <div className="col-md-3">
@@ -81,7 +81,7 @@ const Home = () => {
                 <div className="feature-icon">⏰</div>
                 <h3>Timings</h3>
                 <p>Check bus departure and arrival times for your convenience.</p>
-                <button onClick={scrollToTimings} className="btn btn-outline-primary">View Timings</button>
+                <button onClick={scrollToTimings} className="btn btn-outline-primary feature-action-btn">View Timings</button>
               </div>
             </div>
             <div className="col-md-3">
@@ -90,7 +90,7 @@ const Home = () => {
                 <h3>Live Tracking</h3>
                 <p>Track your assigned bus location in real-time.</p>
                 {user && user.role === 'student' && user.bus ? (
-                  <Link to="/track" className="btn btn-success">Track My Bus</Link>
+                  <Link to="/track" className="btn btn-outline-primary feature-action-btn">Track My Bus</Link>
                 ) : (
                   <span className="text-muted small">Login as student to access</span>
                 )}
@@ -101,7 +101,7 @@ const Home = () => {
                 <div className="feature-icon">📞</div>
                 <h3>Contacts</h3>
                 <p>Get in touch with drivers and bus incharges when needed.</p>
-                <Link to="/contacts" className="btn btn-outline-primary">View Contacts</Link>
+                <Link to="/contacts" className="btn btn-outline-primary feature-action-btn">View Contacts</Link>
               </div>
             </div>
           </div>

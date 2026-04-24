@@ -15,29 +15,32 @@ import Register from './pages/Register';
 import DriverDashboard from './pages/DriverDashboard';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { ToastProvider } from './context/ToastContext';
 
 function App() {
   return (
     <AuthProvider>
       <NotificationProvider>
-        <Router>
-          <div className="App">
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/routes" element={<RoutePage />} />
-              <Route path="/contacts" element={<Contacts />} />
-              <Route path="/track" element={<Track />} />
-              <Route path="/buspass" element={<BusPass />} />
-              <Route path="/attendance" element={<Attendance />} />
-              <Route path="/admin-qr" element={<AdminQR />} />
-              <Route path="/admin-attendance" element={<AdminAttendance />} />
-              <Route path="/driver" element={<DriverDashboard />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-            </Routes>
-          </div>
-        </Router>
+        <ToastProvider>
+          <Router>
+            <div className="App">
+              <Navbar />
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/routes" element={<RoutePage />} />
+                <Route path="/contacts" element={<Contacts />} />
+                <Route path="/track" element={<Track />} />
+                <Route path="/buspass" element={<BusPass />} />
+                <Route path="/attendance" element={<Attendance />} />
+                <Route path="/admin-qr" element={<AdminQR />} />
+                <Route path="/admin-attendance" element={<AdminAttendance />} />
+                <Route path="/driver" element={<DriverDashboard />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+              </Routes>
+            </div>
+          </Router>
+        </ToastProvider>
       </NotificationProvider>
     </AuthProvider>
   );

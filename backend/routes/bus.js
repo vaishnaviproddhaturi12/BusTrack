@@ -188,6 +188,7 @@ router.get("/routes", async (req, res) => {
     const routes = buses.map(bus => ({
       id: bus._id,
       name: bus.route,
+      busNumber: bus.busNumber,
       stops: bus.stops || [],
       distance: bus.distance || 'N/A'
     }));
