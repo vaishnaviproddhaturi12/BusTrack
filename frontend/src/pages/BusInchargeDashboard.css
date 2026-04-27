@@ -1,0 +1,228 @@
+.bus-incharge-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.incharge-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+  color: white;
+}
+
+.incharge-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.incharge-header p {
+  margin: 10px 0 0;
+  opacity: 0.9;
+}
+
+.incharge-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.buses-section,
+.report-section,
+.issues-section {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.buses-section {
+  grid-column: 1 / -1;
+}
+
+.buses-section h2,
+.report-section h2,
+.issues-section h2 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 10px;
+}
+
+.buses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.bus-card {
+  padding: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.bus-card:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+.bus-card.selected {
+  border-color: #667eea;
+  background: #f0f4ff;
+}
+
+.bus-card.has-issue {
+  border-color: #ff6b6b;
+  background: #fff5f5;
+}
+
+.bus-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.bus-route {
+  color: #666;
+  margin: 5px 0;
+}
+
+.bus-time {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.bus-status-badge {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background: #ff6b6b;
+  color: white;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+.no-buses,
+.no-issues {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+}
+
+.issue-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group select,
+.form-group input,
+.form-group textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.submit-btn {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.issues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.issue-card {
+  padding: 15px;
+  background: #fff5f5;
+  border: 1px solid #ff6b6b;
+  border-radius: 8px;
+}
+
+.issue-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.issue-bus {
+  font-weight: bold;
+  color: #667eea;
+}
+
+.issue-type {
+  color: #ff6b6b;
+  font-weight: 600;
+}
+
+.issue-message {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.resolve-btn {
+  padding: 8px 15px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.resolve-btn:hover {
+  background: #218838;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 50px;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .incharge-content {
+    grid-template-columns: 1fr;
+  }
+}

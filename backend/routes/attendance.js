@@ -19,6 +19,18 @@ const getCurrentDate = () => {
   return new Date().toISOString().split('T')[0];
 };
 
+const getReadableStudentId = (user) => {
+  if (user.role === 'student') {
+    return user._id;
+  }
+
+  if (user.role === 'parent' && user.studentId) {
+    return user.studentId._id || user.studentId;
+  }
+
+  return null;
+};
+
 router.post('/scan', authMiddleware, async (req, res) => {
   try {
     const { busId, qrData, latitude, longitude } = req.body;
@@ -121,12 +133,14 @@ router.post('/scan', authMiddleware, async (req, res) => {
 
 router.get('/my', authMiddleware, async (req, res) => {
   try {
-    if (req.user.role !== 'student') {
-      return res.status(403).json({ message: 'Only students can view their attendance' });
+    const studentId = getReadableStudentId(req.user);
+
+    if (!studentId) {
+      return res.status(403).json({ message: 'Only students and linked parents can view attendance' });
     }
 
     const { startDate, endDate } = req.query;
-    const query = { studentId: req.user._id };
+    const query = { studentId };
 
     if (startDate && endDate) {
       query.date = { $gte: startDate, $lte: endDate };
@@ -150,6 +164,13 @@ router.get('/my', authMiddleware, async (req, res) => {
 
 router.get('/student/:id', authMiddleware, async (req, res) => {
   try {
+    if (req.user.role !== 'admin') {
+      const readableStudentId = getReadableStudentId(req.user);
+      if (!readableStudentId || readableStudentId.toString() !== req.params.id) {
+        return res.status(403).json({ message: 'You can only view attendance for your linked student' });
+      }
+    }
+
     const { startDate, endDate } = req.query;
     const query = { studentId: req.params.id };
 

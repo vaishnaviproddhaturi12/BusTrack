@@ -14,7 +14,7 @@ const notificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['bus_late', 'general'],
+      enum: ['bus_late', 'bus_issue', 'bus_resolved', 'general'],
       default: 'general'
     },
     title: {

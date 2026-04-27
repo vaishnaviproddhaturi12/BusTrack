@@ -48,6 +48,8 @@ const Track = () => {
   const [busSpeed, setBusSpeed] = useState(0);
   const [estimatedDelay, setEstimatedDelay] = useState(0);
   const [trafficStartTime, setTrafficStartTime] = useState(null);
+  const [attendance, setAttendance] = useState(null);
+  const [attendanceUpdated, setAttendanceUpdated] = useState(null);
   const previousLocationRef = React.useRef(null);
   const previousTimeRef = React.useRef(null);
 
@@ -150,13 +152,38 @@ const Track = () => {
       Notification.requestPermission();
     }
 
-    // Check if user is a student and has a bus assigned
-    if (user.role !== 'student' || !user.bus) {
+    // Check if user is a student/parent and has a bus assigned
+    if (!['student', 'parent'].includes(user.role) || !user.bus) {
       setLoading(false);
       return;
     }
 
     setBus(user.bus);
+
+    // Function to fetch attendance (for parents)
+    const fetchAttendanceData = async () => {
+      if (user.role !== 'parent') return;
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/api/attendance/my`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await response.json();
+
+        if (response.ok && Array.isArray(data) && data.length > 0) {
+          // Get today's record if available
+          const today = new Date().toISOString().split('T')[0];
+          const todayRecord = data.find(record => record.date === today);
+          setAttendance(todayRecord || null);
+          setAttendanceUpdated(new Date());
+        } else {
+          setAttendance(null);
+        }
+      } catch (error) {
+        console.log('Error fetching attendance:', error);
+      }
+    };
 
     // Start tracking the bus location
     const fetchLocation = () => {
@@ -204,6 +231,11 @@ const Track = () => {
             });
             setLastUpdated(new Date());
             setError(null);
+
+            // Also fetch attendance for parents on each location update
+            if (user.role === 'parent') {
+              fetchAttendanceData();
+            }
           } else {
             setError('Bus location not available');
           }
@@ -237,14 +269,14 @@ const Track = () => {
     return <Navigate to="/" />;
   }
 
-  if (user.role !== 'student') {
+  if (!['student', 'parent'].includes(user.role)) {
     return (
       <div className="track-container">
         <div className="container">
           <h1 className="page-title">Bus Tracking</h1>
           <div className="alert alert-info">
             <h4>Access Restricted</h4>
-            <p>Live bus tracking is only available for students.</p>
+            <p>Live bus tracking is only available for students and parents.</p>
           </div>
         </div>
       </div>
@@ -273,7 +305,7 @@ const Track = () => {
           <h1 className="page-title">Bus Tracking</h1>
           <div className="alert alert-warning">
             <h4>No Bus Assigned</h4>
-            <p>You haven't been assigned to a bus yet. Please contact the administration.</p>
+            <p>{user.role === 'parent' ? "Your linked student has not been assigned to a bus yet." : "You haven't been assigned to a bus yet."} Please contact the administration.</p>
           </div>
         </div>
       </div>
@@ -284,13 +316,47 @@ const Track = () => {
     <div className="track-container">
       <div className="container">
         <h1 className="page-title">Live Bus Tracking</h1>
-        <p className="page-subtitle">Track your assigned bus in real-time</p>
+        <p className="page-subtitle">
+          {user.role === 'parent' && user.student?.name
+            ? `Track ${user.student.name}'s assigned bus in real-time`
+            : 'Track your assigned bus in real-time'}
+        </p>
 
         <div className="bus-info-card">
-          <h3>Your Bus: {bus.busNumber}</h3>
+          <h3>{user.role === 'parent' ? "Student's Bus" : 'Your Bus'}: {bus.busNumber}</h3>
+          {user.role === 'parent' && user.student?.name && (
+            <p><strong>Student:</strong> {user.student.name}</p>
+          )}
           <p><strong>Route:</strong> {bus.route}</p>
           <p><strong>Driver:</strong> {bus.driver.name} ({bus.driver.phone})</p>
         </div>
+
+        {user.role === 'parent' && attendance && (
+          <div className="attendance-status-card">
+            <h5>📋 Today's Attendance</h5>
+            <div style={{ display: 'flex', gap: '20px', marginTop: '10px' }}>
+              <div>
+                <strong>Morning:</strong> {' '}
+                {attendance.morning ? (
+                  <span style={{ color: '#28a745', fontWeight: 'bold' }}>✓ Present</span>
+                ) : (
+                  <span style={{ color: '#6c757d' }}>- Not marked</span>
+                )}
+              </div>
+              <div>
+                <strong>Evening:</strong> {' '}
+                {attendance.evening ? (
+                  <span style={{ color: '#28a745', fontWeight: 'bold' }}>✓ Present</span>
+                ) : (
+                  <span style={{ color: '#6c757d' }}>- Not marked</span>
+                )}
+              </div>
+            </div>
+            <small style={{ color: '#6c757d', marginTop: '8px', display: 'block' }}>
+              Last updated: {attendanceUpdated ? attendanceUpdated.toLocaleTimeString() : 'N/A'}
+            </small>
+          </div>
+        )}
 
         {trafficAlert && (
           <div className="alert alert-warning">

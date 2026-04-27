@@ -14,7 +14,17 @@ const authMiddleware = async (req, res, next) => {
     }
 
     const verified = jwt.verify(token, JWT_SECRET);
-    const user = await User.findById(verified.id).populate('busId');
+    let user = null;
+
+    try {
+      user = await User.findById(verified.id)
+        .populate('busId')
+        .populate('studentId');
+    } catch (populateErr) {
+      console.error('Error populating user data:', populateErr);
+      // Try without population
+      user = await User.findById(verified.id);
+    }
 
     if (!user) {
       return res.status(401).json({ message: "User not found" });
@@ -23,7 +33,8 @@ const authMiddleware = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    res.status(401).json({ message: "Invalid token" });
+    console.error('Auth middleware error:', err.message);
+    res.status(401).json({ message: "Invalid token or authentication failed" });
   }
 };
 

@@ -77,9 +77,24 @@ const Navbar = () => {
                 </li>
               </>
             )}
+            {user && user.role === 'parent' && (
+              <>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/track" onClick={closeMobileMenu}>Track Student Bus</NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/attendance" onClick={closeMobileMenu}>Attendance</NavLink>
+                </li>
+              </>
+            )}
             {user && user.role === 'driver' && (
               <li className="nav-item">
                 <NavLink className="nav-link" to="/driver" onClick={closeMobileMenu}>Driver Dashboard</NavLink>
+              </li>
+            )}
+            {user && user.role === 'busIncharge' && (
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/bus-incharge" onClick={closeMobileMenu}>Bus Incharge</NavLink>
               </li>
             )}
             {user && user.role === 'admin' && (
@@ -89,6 +104,9 @@ const Navbar = () => {
                 </li>
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/admin-attendance" onClick={closeMobileMenu}>Attendance</NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/admin-parents" onClick={closeMobileMenu}>Parent Logins</NavLink>
                 </li>
               </>
             )}

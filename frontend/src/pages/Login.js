@@ -13,6 +13,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const { login } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -24,57 +25,114 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
+  const performLogin = async (formData, isRetry = false) => {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
+        signal: controller.signal
       });
 
-      const data = await response.json();
+      clearTimeout(timeoutId);
 
-      if (response.ok) {
-        let userData = data.user;
-
-        if (['student', 'driver'].includes(data.user.role)) {
-          try {
-            const busResponse = await fetch(`${API_BASE_URL}/api/bus/my-bus`, {
-              headers: { Authorization: `Bearer ${data.token}` }
-            });
-
-            if (busResponse.ok) {
-              const busData = await busResponse.json();
-              if (busData.id) {
-                userData = { ...data.user, bus: busData };
-              }
-            }
-          } catch (err) {
-            console.log('Unable to load assigned bus after login:', err);
-          }
-        }
-
-        login(data.token, userData);
-        showToast('Logged in successfully.');
-        if (data.user.role === 'driver') {
-          navigate('/driver');
-        } else if (data.user.role === 'admin') {
-          navigate('/');
-        } else {
-          navigate('/track');
-        }
-      } else {
-        setError(data.message || 'Login failed');
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Login failed');
       }
+
+      const data = await response.json();
+      let userData = data.user;
+
+      // Try to load bus data but don't fail if it doesn't load
+      if (['student', 'driver', 'parent'].includes(data.user.role) && !data.user.bus) {
+        try {
+          const busController = new AbortController();
+          const busBusTimeoutId = setTimeout(() => busController.abort(), 5000);
+
+          const busResponse = await fetch(`${API_BASE_URL}/api/bus/my-bus`, {
+            headers: { Authorization: `Bearer ${data.token}` },
+            signal: busController.signal
+          });
+
+          clearTimeout(busBusTimeoutId);
+
+          if (busResponse.ok) {
+            const busData = await busResponse.json();
+            if (busData.id) {
+              userData = { ...data.user, bus: busData };
+            }
+          }
+        } catch (err) {
+          console.log('Bus data load skipped (continuing without it):', err.message);
+        }
+      }
+
+      login(data.token, userData);
+      showToast('Logged in successfully.');
+      
+      if (data.user.role === 'driver') {
+        navigate('/driver');
+      } else if (data.user.role === 'busIncharge') {
+        navigate('/bus-incharge');
+      } else if (data.user.role === 'admin') {
+        navigate('/');
+      } else if (data.user.role === 'parent') {
+        navigate('/track');
+      } else {
+        navigate('/track');
+      }
+
+      return true;
     } catch (err) {
-      setError('Network error. Please try again.');
-    } finally {
+      if (err.name === 'AbortError') {
+        throw new Error('Request timeout. Please check your connection.');
+      }
+      throw err;
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setRetryCount(0);
+
+    try {
+      await performLogin(formData);
+    } catch (err) {
+      console.error('Login error:', err);
+      
+      // Determine if we should retry
+      const isNetworkError = err.message.includes('timeout') || 
+                              err.message.includes('Failed to fetch') ||
+                              err.message.includes('connection');
+      
+      if (isNetworkError && retryCount < 2) {
+        setRetryCount(prev => prev + 1);
+        setError(`Connection issue. Retrying... (Attempt ${retryCount + 2}/3)`);
+        
+        // Retry after 2 seconds
+        setTimeout(() => {
+          performLogin(formData, true)
+            .then(() => {
+              setLoading(false);
+            })
+            .catch(retryErr => {
+              setError(retryErr.message || 'Login failed. Please try again.');
+              setLoading(false);
+            });
+        }, 2000);
+        
+        return;
+      }
+      
+      setError(err.message || 'Network error. Please check your connection and try again.');
       setLoading(false);
     }
   };

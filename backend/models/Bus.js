@@ -27,6 +27,15 @@ const busSchema = new mongoose.Schema({
     name: String,
     phone: String
   },
+  // Bus status for issue tracking
+  status: {
+    type: String,
+    default: null
+  },
+  statusMessage: {
+    type: String,
+    default: null
+  },
   startTime: {
     type: String,
     required: true

@@ -19,9 +19,21 @@ const userSchema = new mongoose.Schema({
 
   role: {
     type: String,
-    enum: ["student", "driver", "admin"],
+    enum: ["student", "driver", "admin", "busIncharge", "parent"],
     default: "student"
   },
+
+  studentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+  },
+
+  // For bus incharge - which buses they manage
+  assignedBuses: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Bus"
+  }],
 
   busId: {
     type: mongoose.Schema.Types.ObjectId,

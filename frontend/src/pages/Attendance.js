@@ -11,6 +11,7 @@ const Attendance = () => {
   const [messageType, setMessageType] = useState('');
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [lastRefreshed, setLastRefreshed] = useState(null);
 
   const updateCameraLabels = () => {
     const scannerRoot = document.getElementById('qr-reader');
@@ -38,8 +39,14 @@ const Attendance = () => {
   };
 
   useEffect(() => {
-    if (user && user.role === 'student') {
+    if (user && ['student', 'parent'].includes(user.role)) {
       fetchAttendance();
+
+      // Set up polling for real-time attendance updates (every 5 seconds for parents)
+      if (user.role === 'parent') {
+        const attendanceInterval = setInterval(fetchAttendance, 5000);
+        return () => clearInterval(attendanceInterval);
+      }
     }
   }, [user]);
 
@@ -108,9 +115,21 @@ const Attendance = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await response.json();
-      setAttendance(data);
+      
+      if (response.ok && Array.isArray(data)) {
+        setAttendance(data);
+      } else if (!response.ok) {
+        console.error('Error fetching attendance:', data.message || 'Unknown error');
+        setAttendance([]);
+      } else {
+        setAttendance([]);
+      }
+      
+      // Update the last refreshed timestamp
+      setLastRefreshed(new Date());
     } catch (error) {
       console.error('Error fetching attendance:', error);
+      setAttendance([]);
     } finally {
       setLoading(false);
     }
@@ -193,11 +212,11 @@ const Attendance = () => {
     setScanning(false);
   };
 
-  if (!user || user.role !== 'student') {
+  if (!user || !['student', 'parent'].includes(user.role)) {
     return (
       <div className="container my-5">
         <h2>Attendance</h2>
-        <p className="text-muted">Please log in as a student to mark attendance.</p>
+        <p className="text-muted">Please log in as a student or parent to view attendance.</p>
       </div>
     );
   }
@@ -208,25 +227,34 @@ const Attendance = () => {
     <div className="attendance-page py-5">
       <div className="container">
         <div className="attendance-container">
-          <h2>Bus Attendance</h2>
-
-          <div className="attendance-window-notice" style={{ background: '#d4edda', borderColor: '#c3e6cb' }}>
-            <p>Morning attendance: 7:00 AM to 9:00 AM</p>
-            <p>Evening attendance: 3:45 PM to 6:00 PM</p>
-            <p className="text-muted">Current time: {now.toLocaleTimeString()}</p>
-          </div>
-
-          <div className="scan-section">
-            <p className="scan-instructions">
-              Scan the QR code inside your bus to mark attendance.
-            </p>
-
-            <div className="scan-buttons">
-              <button className="btn btn-primary btn-lg" onClick={openScanner}>
-                Scan Bus QR
-              </button>
+          <h2>{user.role === 'parent' ? "Student Attendance" : "Bus Attendance"}</h2>
+          {user.role === 'parent' && user.student?.name && (
+            <div className="alert alert-info">
+              Viewing attendance for {user.student.name}
             </div>
-          </div>
+          )}
+
+          {user.role === 'student' && (
+            <div className="attendance-window-notice" style={{ background: '#d4edda', borderColor: '#c3e6cb' }}>
+              <p>Morning attendance: 7:00 AM to 9:00 AM</p>
+              <p>Evening attendance: 3:45 PM to 6:00 PM</p>
+              <p className="text-muted">Current time: {now.toLocaleTimeString()}</p>
+            </div>
+          )}
+
+          {user.role === 'student' && (
+            <div className="scan-section">
+              <p className="scan-instructions">
+                Scan the QR code inside your bus to mark attendance.
+              </p>
+
+              <div className="scan-buttons">
+                <button className="btn btn-primary btn-lg" onClick={openScanner}>
+                  Scan Bus QR
+                </button>
+              </div>
+            </div>
+          )}
 
           {message && (
             <div className={`alert alert-${messageType === 'error' ? 'danger' : messageType === 'success' ? 'success' : 'info'}`}>
@@ -249,7 +277,12 @@ const Attendance = () => {
           )}
 
           <div className="attendance-history mt-5">
-            <h3>Your Attendance History</h3>
+            <h3>{user.role === 'parent' ? "Attendance History" : "Your Attendance History"}</h3>
+            {user.role === 'parent' && lastRefreshed && (
+              <small style={{ color: '#6c757d', display: 'block', marginBottom: '10px' }}>
+                🔄 Auto-updating • Last refreshed: {lastRefreshed.toLocaleTimeString()}
+              </small>
+            )}
 
             {loading ? (
               <p>Loading...</p>
