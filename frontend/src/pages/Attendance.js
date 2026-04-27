@@ -48,6 +48,7 @@ const Attendance = () => {
         return () => clearInterval(attendanceInterval);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   useEffect(() => {
@@ -106,6 +107,7 @@ const Attendance = () => {
         console.log('QR scanner cleanup skipped:', error);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanning]);
 
   const fetchAttendance = async () => {

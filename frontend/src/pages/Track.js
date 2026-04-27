@@ -45,8 +45,8 @@ const Track = () => {
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [trafficAlert, setTrafficAlert] = useState(null);
-  const [busSpeed, setBusSpeed] = useState(0);
-  const [estimatedDelay, setEstimatedDelay] = useState(0);
+  const [, setBusSpeed] = useState(0);
+  const [, setEstimatedDelay] = useState(0);
   const [trafficStartTime, setTrafficStartTime] = useState(null);
   const [attendance, setAttendance] = useState(null);
   const [attendanceUpdated, setAttendanceUpdated] = useState(null);
@@ -78,7 +78,6 @@ const Track = () => {
     let delayMinutes = 0;
     if (speed > 0 && speed < NORMAL_SPEED) {
       // Calculate how much slower than normal speed
-      const speedDeficit = NORMAL_SPEED - speed; // m/s slower
       const normalTimeForDistance = distance / NORMAL_SPEED; // seconds at normal speed
       const actualTimeForDistance = timeDiff; // seconds at current speed
       delayMinutes = ((actualTimeForDistance - normalTimeForDistance) / 60).toFixed(1);
@@ -255,6 +254,7 @@ const Track = () => {
     setLoading(false);
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   if (!user) {

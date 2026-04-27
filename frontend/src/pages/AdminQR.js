@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import QRCode from 'qrcode';
+import API_BASE_URL from '../apiConfig';
 import './AdminQR.css';
 
 const AdminQR = () => {
@@ -15,7 +16,7 @@ const AdminQR = () => {
 
   const fetchBuses = async () => {
     try {
-      const response = await fetch('https://bustrack-backend-dod9.onrender.com/api/bus/all');
+      const response = await fetch(`${API_BASE_URL}/api/bus/all`);
       const data = await response.json();
       setBuses(data);
       

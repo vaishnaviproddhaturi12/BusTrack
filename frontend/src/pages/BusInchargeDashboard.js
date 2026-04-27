@@ -28,6 +28,7 @@ const BusInchargeDashboard = () => {
 
   useEffect(() => {
     fetchAssignedBuses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchAssignedBuses = async () => {

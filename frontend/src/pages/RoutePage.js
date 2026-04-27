@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import API_BASE_URL from '../apiConfig';
 import './RoutePage.css';
 
@@ -8,20 +8,30 @@ const naturalCompare = (a = '', b = '') =>
 const RoutePage = () => {
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredRoutes, setFilteredRoutes] = useState([]);
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/bus/routes`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Unable to load bus routes');
+        }
+        return res.json();
+      })
       .then((data) => {
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid routes response');
+        }
+
         const sortedRoutes = [...data].sort((a, b) => naturalCompare(a.name, b.name));
         setRoutes(sortedRoutes);
-        setFilteredRoutes(sortedRoutes);
+        setError('');
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        console.error('Routes load error:', err);
+        setError('Unable to load bus routes right now. Please try again after the server starts.');
         setLoading(false);
       });
   }, []);
@@ -50,26 +60,18 @@ const RoutePage = () => {
     });
   };
 
-  const handleSearch = (query = searchTerm) => {
-    const searchQuery = typeof query === 'string' ? query : searchTerm;
-    const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredRoutes = useMemo(() => {
+    const normalizedQuery = searchTerm.trim().toLowerCase();
 
     if (normalizedQuery === '') {
-      setFilteredRoutes(routes);
-      return;
+      return routes;
     }
 
-    const filtered = routes.filter((route) => {
+    return routes.filter((route) => {
       const matchesName = route.name.toLowerCase().includes(normalizedQuery);
       const matchesStop = route.stops?.some((stop) => stop.toLowerCase().includes(normalizedQuery));
       return matchesName || matchesStop;
     });
-
-    setFilteredRoutes(filtered);
-  };
-
-  useEffect(() => {
-    handleSearch(searchTerm);
   }, [searchTerm, routes]);
 
   if (loading) {
@@ -93,6 +95,8 @@ const RoutePage = () => {
         <h1 className="page-title">Bus Routes</h1>
         <p className="page-subtitle">Explore all available bus routes and their timings</p>
 
+        {error && <div className="alert alert-warning text-center">{error}</div>}
+
         <div className="search-section mb-4">
           <div className="row">
             <div className="col-md-8">
@@ -102,11 +106,10 @@ const RoutePage = () => {
                 placeholder="Search routes or stops..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
             <div className="col-md-4 search-button-col">
-              <button className="btn btn-primary search-button" onClick={() => handleSearch()}>
+              <button className="btn btn-primary search-button" onClick={() => setSearchTerm(searchTerm.trim())}>
                 Search
               </button>
             </div>
@@ -114,7 +117,9 @@ const RoutePage = () => {
         </div>
 
         {filteredRoutes.length === 0 ? (
-          <p className="text-center text-muted mt-4">No matching routes found.</p>
+          <p className="text-center text-muted mt-4">
+            {searchTerm.trim() ? 'No matching routes found.' : 'No bus routes available right now.'}
+          </p>
         ) : (
           <div className="routes-grid">
             {filteredRoutes.map((route, index) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import API_BASE_URL from '../apiConfig';
 import './Contacts.css';
 
@@ -8,35 +8,44 @@ const naturalCompare = (a = '', b = '') =>
 const Contacts = () => {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredContacts, setFilteredContacts] = useState([]);
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/bus/contacts`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Unable to load bus contacts');
+        }
+        return res.json();
+      })
       .then((data) => {
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid contacts response');
+        }
+
         const sortedContacts = [...data].sort((a, b) =>
           naturalCompare(a.busNumber, b.busNumber)
         );
         setContacts(sortedContacts);
-        setFilteredContacts(sortedContacts);
+        setError('');
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        console.error('Contacts load error:', err);
+        setError('Unable to load bus contacts right now. Please try again after the server starts.');
         setLoading(false);
       });
   }, []);
 
-  const handleSearch = (query = searchTerm) => {
-    const normalizedQuery = query.trim().toLowerCase();
+  const filteredContacts = useMemo(() => {
+    const normalizedQuery = searchTerm.trim().toLowerCase();
 
     if (!normalizedQuery) {
-      setFilteredContacts(contacts);
-      return;
+      return contacts;
     }
 
-    const filtered = contacts.filter((contact) =>
+    return contacts.filter((contact) =>
       [
         contact.busNumber,
         contact.driver?.name,
@@ -47,12 +56,6 @@ const Contacts = () => {
         .filter(Boolean)
         .some((value) => value.toLowerCase().includes(normalizedQuery))
     );
-
-    setFilteredContacts(filtered);
-  };
-
-  useEffect(() => {
-    handleSearch(searchTerm);
   }, [searchTerm, contacts]);
 
   if (loading) {
@@ -76,6 +79,8 @@ const Contacts = () => {
         <h1 className="page-title">Bus Contacts</h1>
         <p className="page-subtitle">Contact information for drivers and bus incharges</p>
 
+        {error && <div className="alert alert-warning text-center">{error}</div>}
+
         <div className="search-section mb-4">
           <div className="row">
             <div className="col-md-8">
@@ -85,11 +90,10 @@ const Contacts = () => {
                 placeholder="Search by bus number, driver, incharge, or phone..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
             <div className="col-md-4 search-button-col">
-              <button className="btn btn-primary search-button" onClick={() => handleSearch()}>
+              <button className="btn btn-primary search-button" onClick={() => setSearchTerm(searchTerm.trim())}>
                 Search
               </button>
             </div>
@@ -107,9 +111,9 @@ const Contacts = () => {
                   <div className="person-icon">{'\u{1F468}\u200D\u{1F68C}'}</div>
                   <div className="person-info">
                     <h4>Driver</h4>
-                    <p className="person-name">{contact.driver.name}</p>
-                    <a href={`tel:${contact.driver.phone}`} className="phone-link">
-                      {contact.driver.phone}
+                    <p className="person-name">{contact.driver?.name || 'N/A'}</p>
+                    <a href={`tel:${contact.driver?.phone || ''}`} className="phone-link">
+                      {contact.driver?.phone || 'N/A'}
                     </a>
                   </div>
                 </div>
@@ -117,9 +121,9 @@ const Contacts = () => {
                   <div className="person-icon">{'\u{1F468}\u200D\u{1F3EB}'}</div>
                   <div className="person-info">
                     <h4>Bus Incharge</h4>
-                    <p className="person-name">{contact.incharge.name}</p>
-                    <a href={`tel:${contact.incharge.phone}`} className="phone-link">
-                      {contact.incharge.phone}
+                    <p className="person-name">{contact.incharge?.name || 'N/A'}</p>
+                    <a href={`tel:${contact.incharge?.phone || ''}`} className="phone-link">
+                      {contact.incharge?.phone || 'N/A'}
                     </a>
                   </div>
                 </div>
@@ -128,7 +132,9 @@ const Contacts = () => {
           ))}
         </div>
         {!filteredContacts.length && (
-          <p className="text-center text-muted mt-4">No matching contacts found.</p>
+          <p className="text-center text-muted mt-4">
+            {searchTerm.trim() ? 'No matching contacts found.' : 'No bus contacts available right now.'}
+          </p>
         )}
       </div>
     </div>

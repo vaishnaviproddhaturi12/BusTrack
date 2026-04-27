@@ -18,6 +18,7 @@ const AdminAttendance = () => {
     if (user && user.role === 'admin') {
       fetchAttendance();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, startDate, endDate]);
 
   const fetchAttendance = async () => {

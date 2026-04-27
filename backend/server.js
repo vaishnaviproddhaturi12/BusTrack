@@ -8,10 +8,38 @@ dotenv.config({ path: __dirname + '/.env' });
 
 const app = express();
 const MONGO_URI = process.env.MONGO_URI || process.env.MONGO_URL;
+const configuredOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5000',
+  process.env.CLIENT_URL,
+  process.env.FRONTEND_URL,
+  ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim()) : [])
+].filter(Boolean);
+
+const allowedHostedDomains = [/\.vercel\.app$/, /\.netlify\.app$/, /\.onrender\.com$/];
 
 // Middlewares
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5000'],
+  origin: (origin, callback) => {
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    try {
+      const { hostname } = new URL(origin);
+      const isAllowedHostedDomain = allowedHostedDomains.some((pattern) => pattern.test(hostname));
+
+      if (configuredOrigins.includes(origin) || isAllowedHostedDomain) {
+        return callback(null, true);
+      }
+    } catch (err) {
+      console.error('Invalid CORS origin:', origin);
+    }
+
+    return callback(new Error(`CORS blocked origin: ${origin}`));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
